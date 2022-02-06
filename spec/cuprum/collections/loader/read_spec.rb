@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'yaml'
-
 require 'cuprum/collections/basic/collection'
 
 require 'cuprum/collections/loader/read'

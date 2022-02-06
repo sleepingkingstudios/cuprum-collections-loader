@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 require 'cuprum/collections/loader'
 
 module Cuprum::Collections::Loader
@@ -49,6 +51,7 @@ module Cuprum::Collections::Loader
       dir_proxy
         .glob(File.join(qualified_path, '*.yml'))
         .reject { |file_path| File.basename(file_path).start_with?('_') }
+        .sort
         .each(&block)
     end
 

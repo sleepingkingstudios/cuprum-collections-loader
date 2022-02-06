@@ -1,0 +1,6 @@
+---
+find_by: slug
+middleware:
+  - Spec::Support::Middleware::GenerateSlug
+review:
+  multiline: true
