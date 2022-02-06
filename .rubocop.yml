@@ -32,9 +32,42 @@ RSpec:
         - xinclude_examples
         - xwrap_examples
 
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
 Layout/HashAlignment:
   EnforcedColonStyle:      table
   EnforcedHashRocketStyle: table
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*_spec.rb
+
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*_contract*.rb
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: exception
+
+RSpec/ExampleWording:
+  Enabled: false
+
+RSpec/FilePath:
+  Exclude:
+    - spec/integration/**/*_spec.rb
+
+RSpec/HookArgument:
+  EnforcedStyle: example
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+RSpec/NestedGroups:
+  Max: 5
+
+Style/AccessorGrouping:
+  EnforcedStyle: separated
 
 Style/ClassAndModuleChildren:
   Enabled: false

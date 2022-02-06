@@ -10,6 +10,7 @@ require 'rspec/sleeping_king_studios/all'
 require 'byebug'
 
 require 'cuprum/rspec/be_a_result'
+require 'cuprum/rspec/be_callable'
 
 # Isolated namespace for defining spec-only or transient objects.
 module Spec; end
