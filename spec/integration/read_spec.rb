@@ -25,7 +25,7 @@ RSpec.describe Cuprum::Collections::Loader::Read do
             RAW
           },
           {
-            'title'  => 'The Winter Of Our Discontent',
+            'title'  => 'the winter of our discontent',
             'author' => 'Pyra Mania',
             'review' => <<~RAW.strip
               The first half is an invaluable treatise on Fire magic. The second half is
@@ -34,7 +34,7 @@ RSpec.describe Cuprum::Collections::Loader::Read do
             RAW
           },
           {
-            'title'  => 'Burning Love',
+            'title'  => 'BuRnInG lOvE',
             'author' => 'Pyra Mania',
             'review' => <<~RAW.strip
               I would tell you to burn this, but it might like it. Bury it in the desert.
@@ -45,12 +45,14 @@ RSpec.describe Cuprum::Collections::Loader::Read do
       end
       let(:expected_options) do
         {
-          'find_by'    => 'slug',
-          'middleware' => [
-            'Spec::Support::Middleware::GenerateSlug'
-          ],
-          'review'     => {
+          'find_by' => 'title',
+          'review'  => {
             'multiline' => true
+          },
+          'title'   => {
+            'middleware' => [
+              'Spec::Support::Middleware::Titleize'
+            ]
           }
         }
       end

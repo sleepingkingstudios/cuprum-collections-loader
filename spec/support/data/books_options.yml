@@ -1,6 +1,7 @@
 ---
-find_by: slug
-middleware:
-  - Spec::Support::Middleware::GenerateSlug
+find_by: title
 review:
   multiline: true
+title:
+  middleware:
+    - Spec::Support::Middleware::Titleize
