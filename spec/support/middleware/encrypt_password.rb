@@ -5,7 +5,8 @@ require 'cuprum/collections/loader/middleware/entity_middleware'
 require 'support/middleware'
 
 module Spec::Support::Middleware
-  class EncryptPassword < Cuprum::Collections::Loader::Middleware::EntityMiddleware
+  class EncryptPassword <
+        Cuprum::Collections::Loader::Middleware::EntityMiddleware
     private
 
     def encrypt(password)

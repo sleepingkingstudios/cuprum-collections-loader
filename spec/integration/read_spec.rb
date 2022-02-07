@@ -5,7 +5,7 @@ require 'cuprum/collections/loader'
 RSpec.describe Cuprum::Collections::Loader::Read do
   subject(:command) { described_class.new(data_path: data_path) }
 
-  let(:root_path) { __dir__.sub(%r{/spec/integration}, '') }
+  let(:root_path) { __dir__.sub(%r{/spec/integration\z}, '') }
   let(:data_path) { File.join(root_path, 'spec/support/data') }
 
   describe '#call' do
