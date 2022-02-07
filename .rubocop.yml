@@ -39,6 +39,11 @@ Layout/HashAlignment:
   EnforcedColonStyle:      table
   EnforcedHashRocketStyle: table
 
+Layout/LineLength:
+  IgnoredPatterns:
+    - '\A\s*#'
+  Max: 80
+
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
