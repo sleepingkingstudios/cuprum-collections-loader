@@ -21,6 +21,36 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
         .and_keywords(:repository)
         .and_any_keywords
     end
+
+    describe 'with attribute_name: nil' do
+      let(:error_message) { 'invalid attribute name nil' }
+
+      it 'should raise an exception' do
+        expect { described_class.new(nil) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
+
+    describe 'with attribute_name: an Object' do
+      let(:object)        { Object.new.freeze }
+      let(:error_message) { "invalid attribute name #{object.inspect}" }
+
+      it 'should raise an exception' do
+        expect { described_class.new(object) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
+
+    describe 'with attribute_name: a Hash' do
+      let(:error_message) do
+        'wrong number of arguments (given 0, expected 1)'
+      end
+
+      it 'should raise an exception' do
+        expect { described_class.new(options) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
   end
 
   describe '#call' do

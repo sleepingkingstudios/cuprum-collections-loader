@@ -11,10 +11,24 @@ module Cuprum::Collections::Loader::Middleware
     def initialize(attribute_name, **options)
       super(**options)
 
+      validate_attribute_name!(attribute_name)
+
       @attribute_name = attribute_name
     end
 
     # @return [String, Symbol] the name of the attribute.
     attr_reader :attribute_name
+
+    private
+
+    def validate_attribute_name!(attribute_name)
+      return if attribute_name.is_a?(String) && !attribute_name.empty?
+
+      if attribute_name.is_a?(Hash) && options == { repository: nil }
+        raise ArgumentError, 'wrong number of arguments (given 0, expected 1)'
+      end
+
+      raise ArgumentError, "invalid attribute name #{attribute_name.inspect}"
+    end
   end
 end

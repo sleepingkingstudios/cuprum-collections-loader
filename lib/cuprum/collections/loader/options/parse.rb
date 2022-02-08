@@ -7,12 +7,19 @@ require 'cuprum/collections/loader/options'
 module Cuprum::Collections::Loader::Options
   # Parses data options and resolves metadata.
   class Parse < Cuprum::Command # rubocop:disable Metrics/ClassLength
-    # @overload initialize()
-    def initialize(require_proxy: Kernel)
+    # @overload initialize(repository: nil)
+    #   @param repository [Cuprum::Collections::Repository] The repository used
+    #     to query middleware data.
+    def initialize(repository: nil, require_proxy: Kernel)
       super()
 
+      @repository    = repository
       @require_proxy = require_proxy
     end
+
+    # @return [Cuprum::Collections::Repository] the repository used to query
+    #   middleware data.
+    attr_reader :repository
 
     private
 
@@ -21,13 +28,10 @@ module Cuprum::Collections::Loader::Options
     def create_middleware(class_name, attribute_name = nil, **options) # rubocop:disable Metrics/MethodLength
       step { validate_class_name(class_name, attribute_name, **options) }
 
-      args = attribute_name ? [attribute_name] : []
+      args    = attribute_name ? [attribute_name] : []
+      options = options.merge(repository: repository)
 
-      if options.empty?
-        Object.const_get(class_name).new(*args)
-      else
-        Object.const_get(class_name).new(*args, **options)
-      end
+      Object.const_get(class_name).new(*args, **options)
     rescue ArgumentError, NameError => exception
       failure(
         middleware_error(

@@ -2,13 +2,18 @@
 
 require 'yaml'
 
+require 'cuprum/collections/repository'
+
 require 'cuprum/collections/loader'
 
 RSpec.describe Cuprum::Collections::Loader::Options::Parse do
-  subject(:command) { described_class.new }
+  subject(:command) { described_class.new(repository: repository) }
 
   let(:root_path) { __dir__.sub(%r{/spec/integration/options\z}, '') }
   let(:data_path) { File.join(root_path, 'spec/support/data') }
+  let(:repository) do
+    Cuprum::Collections::Repository.new
+  end
 
   describe '#call' do
     let(:options) do
@@ -26,7 +31,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::Support::Middleware::Titleize).and(
               have_attributes(
                 attribute_name: 'title',
-                options:        { repository: nil }
+                options:        { repository: repository }
               )
             )
           ],
@@ -50,7 +55,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         {
           'middleware' => [
             be_a(Spec::Support::Middleware::EncryptPassword).and(
-              have_attributes(options: { repository: nil })
+              have_attributes(options: { repository: repository })
             )
           ]
         }
