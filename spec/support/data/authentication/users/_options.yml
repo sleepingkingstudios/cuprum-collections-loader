@@ -1,3 +1,5 @@
 ---
 middleware:
   - Spec::Support::Middleware::EncryptPassword
+require:
+  - support/middleware/encrypt_password

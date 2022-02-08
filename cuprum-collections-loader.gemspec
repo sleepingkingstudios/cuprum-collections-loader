@@ -28,6 +28,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.7.0'
 
   gem.add_runtime_dependency 'cuprum-collections', '~> 0.2'
+  gem.add_runtime_dependency 'observer',           '~> 0.1'
 
   gem.add_development_dependency 'rspec', '~> 3.10'
   gem.add_development_dependency 'rspec-sleeping_king_studios', '~> 2.7'

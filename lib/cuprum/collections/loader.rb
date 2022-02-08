@@ -7,9 +7,12 @@ module Cuprum::Collections
   module Loader
     autoload :Errors,     'cuprum/collections/loader/errors'
     autoload :Formats,    'cuprum/collections/loader/formats'
+    autoload :Load,       'cuprum/collections/loader/load'
     autoload :Middleware, 'cuprum/collections/loader/middleware'
+    autoload :Observer,   'cuprum/collections/loader/observer'
     autoload :Options,    'cuprum/collections/loader/options'
     autoload :Read,       'cuprum/collections/loader/read'
+    autoload :Upsert,     'cuprum/collections/loader/upsert'
 
     # @return [String] The current version of the gem.
     def self.version

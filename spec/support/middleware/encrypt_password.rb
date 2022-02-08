@@ -18,12 +18,12 @@ module Spec::Support::Middleware
         .join
     end
 
-    def process(next_command, attributes = {})
+    def process(next_command, attributes:)
       attributes = attributes.dup
       password   = attributes.delete('password') || ''
       attributes = attributes.merge('encrypted_password' => encrypt(password))
 
-      super(next_command, attributes)
+      super(next_command, attributes: attributes)
     end
 
     def rot13(chr)

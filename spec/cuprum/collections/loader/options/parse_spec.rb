@@ -3,7 +3,9 @@
 require 'cuprum/collections/loader/options/parse'
 
 RSpec.describe Cuprum::Collections::Loader::Options::Parse do
-  subject(:command) { described_class.new }
+  subject(:command) { described_class.new(**constructor_options) }
+
+  let(:constructor_options) { {} }
 
   describe '.new' do
     it { expect(described_class).to be_constructible.with(0).arguments }
@@ -149,6 +151,13 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           end
         end
       end
+    end
+
+    let(:require_proxy) do
+      class_double(Kernel, require: nil)
+    end
+    let(:constructor_options) do
+      super().merge(require_proxy: require_proxy)
     end
 
     it 'should define the method' do
@@ -497,7 +506,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
       end
     end
 
-    describe 'with a hash with entity and attribute middleware' do
+    describe 'with a Hash with entity and attribute middleware' do
       let(:attribute_name) { 'name' }
       let(:options) do
         {
@@ -548,5 +557,56 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           .with_value(deep_match(expected_value))
       end
     end
+
+    describe 'with a Hash with a require statement' do
+      let(:options)        { { 'require' => 'path/to/require' } }
+      let(:expected_value) { { 'middleware' => [] } }
+
+      it 'should return a passing result' do
+        expect(command.call(options: options))
+          .to be_a_passing_result
+          .with_value(expected_value)
+      end
+
+      it 'should call the require statement' do
+        command.call(options: options)
+
+        expect(require_proxy).to have_received(:require).with('path/to/require')
+      end
+    end
+
+    describe 'with a Hash with multiple require statement' do
+      let(:require_statements) do
+        [
+          'path/to/first',
+          'path/to/second',
+          'path/to/third'
+        ]
+      end
+      let(:options) do
+        { 'require' => require_statements }
+      end
+      let(:expected_value) { { 'middleware' => [] } }
+
+      it 'should return a passing result' do
+        expect(command.call(options: options))
+          .to be_a_passing_result
+          .with_value(expected_value)
+      end
+
+      it 'should call the require statements', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
+        command.call(options: options)
+
+        require_statements.each do |require_path|
+          expect(require_proxy)
+            .to have_received(:require)
+            .with(require_path)
+        end
+      end
+    end
+  end
+
+  describe '#require_proxy' do
+    include_examples 'should define private reader', :require_proxy, Kernel
   end
 end

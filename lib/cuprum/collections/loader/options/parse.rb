@@ -6,8 +6,17 @@ require 'cuprum/collections/loader/options'
 
 module Cuprum::Collections::Loader::Options
   # Parses data options and resolves metadata.
-  class Parse < Cuprum::Command
+  class Parse < Cuprum::Command # rubocop:disable Metrics/ClassLength
+    # @overload initialize()
+    def initialize(require_proxy: Kernel)
+      super()
+
+      @require_proxy = require_proxy
+    end
+
     private
+
+    attr_reader :require_proxy
 
     def create_middleware(class_name, attribute_name = nil, **options) # rubocop:disable Metrics/MethodLength
       step { validate_class_name(class_name, attribute_name, **options) }
@@ -28,6 +37,12 @@ module Cuprum::Collections::Loader::Options
           message:        exception.message
         )
       )
+    end
+
+    def evaluate_requires(require_statements)
+      require_statements.each do |require_path|
+        require_proxy.require require_path
+      end
     end
 
     def middleware?(option)
@@ -84,7 +99,10 @@ module Cuprum::Collections::Loader::Options
 
     def process(options:) # rubocop:disable Metrics/MethodLength
       options    = options.dup
+      requires   = Array(options.delete('require'))
       middleware = options.delete('middleware')
+
+      evaluate_requires(requires)
       middleware = parse_middleware(middleware)
 
       options
