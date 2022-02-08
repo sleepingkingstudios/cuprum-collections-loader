@@ -22,6 +22,33 @@ RSpec.describe Cuprum::Collections::Loader::Load do
 
   # rubocop:disable RSpec/MultipleMemoizedHelpers
   describe '#call' do
+    shared_examples 'should notify the observers' do
+      context 'when the command has an observer' do
+        let(:observer) { Spec::Observer.new }
+
+        example_class 'Spec::Observer' do |klass|
+          klass.define_method(:notifications) do
+            @notifications ||= []
+          end
+
+          klass.define_method(:update) do |action, options|
+            notifications << [action, options]
+          end
+        end
+
+        before(:example) do
+          command.add_observer(observer)
+        end
+
+        it 'should notify the observer' do
+          call_command
+
+          expect(observer.notifications)
+            .to deep_match(expected_notifications)
+        end
+      end
+    end
+
     let(:data) do
       [
         { 'name' => 'Publisher 1' },
@@ -60,6 +87,39 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         default_contract: Stannum::Constraints::Anything
       )
     end
+    let(:relative_path) { collection.collection_name }
+    let(:expected_notifications) do
+      [
+        [
+          :start,
+          {
+            collection_name: collection.collection_name,
+            data:            data,
+            data_path:       data_path,
+            options:         options,
+            relative_path:   relative_path
+          }
+        ],
+        *upsert_results.each.with_index.map do |result, index|
+          [
+            result.status,
+            {
+              attributes:      data[index],
+              collection_name: collection.collection_name,
+              options:         parsed_options,
+              result:          result
+            }
+          ]
+        end,
+        [
+          :finish,
+          {
+            collection_name: collection.collection_name,
+            results:         Cuprum::ResultList.new(*upsert_results)
+          }
+        ]
+      ]
+    end
 
     before(:example) do
       allow(Cuprum::Collections::Loader::Read)
@@ -75,6 +135,10 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         .and_return(upsert_double)
 
       allow(upsert_double).to receive(:call).and_return(*upsert_results)
+    end
+
+    def call_command
+      command.call(collection: collection)
     end
 
     it 'should define the method' do
@@ -122,8 +186,14 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       end
     end
 
+    include_examples 'should notify the observers'
+
     describe 'with relative_path: value' do
       let(:relative_path) { 'metadata/publishers' }
+
+      def call_command
+        command.call(collection: collection, relative_path: relative_path)
+      end
 
       it 'should read the data', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
         command.call(collection: collection, relative_path: relative_path)
@@ -136,28 +206,58 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           .to have_received(:call)
           .with(relative_path: relative_path)
       end
+
+      include_examples 'should notify the observers'
     end
 
     context 'when the read command returns a failing result' do
       let(:error)       { Cuprum::Error.new(message: 'Something went wrong.') }
       let(:read_result) { Cuprum::Result.new(error: error) }
+      let(:expected_notifications) do
+        [
+          [
+            :error,
+            {
+              collection_name: collection.collection_name,
+              error:           read_result.error,
+              relative_path:   relative_path
+            }
+          ]
+        ]
+      end
 
       it 'should return a failing result' do
         expect(command.call(collection: collection))
           .to be_a_failing_result
           .with_error(error)
       end
+
+      include_examples 'should notify the observers'
     end
 
     context 'when the parse options command returns a failing result' do
       let(:error)        { Cuprum::Error.new(message: 'Something went wrong.') }
       let(:parse_result) { Cuprum::Result.new(error: error) }
+      let(:expected_notifications) do
+        [
+          [
+            :error,
+            {
+              collection_name: collection.collection_name,
+              error:           parse_result.error,
+              relative_path:   relative_path
+            }
+          ]
+        ]
+      end
 
       it 'should return a failing result' do
         expect(command.call(collection: collection))
           .to be_a_failing_result
           .with_error(error)
       end
+
+      include_examples 'should notify the observers'
     end
 
     context 'when the upsert command returns a failing result' do
@@ -180,6 +280,8 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           .with_value(expected_value)
           .and_error(expected_error)
       end
+
+      include_examples 'should notify the observers'
     end
 
     context 'when the options includes a find_by attribute' do
@@ -198,6 +300,8 @@ RSpec.describe Cuprum::Collections::Loader::Load do
             .with(attributes: attributes)
         end
       end
+
+      include_examples 'should notify the observers'
     end
 
     context 'when the options include middleware' do
@@ -271,6 +375,8 @@ RSpec.describe Cuprum::Collections::Loader::Load do
             .with(attributes: attributes)
         end
       end
+
+      include_examples 'should notify the observers'
     end
   end
   # rubocop:enable RSpec/MultipleMemoizedHelpers
