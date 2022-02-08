@@ -9,7 +9,7 @@ RSpec.describe Spec::Support::Middleware::Titleize do
 
   describe '#call' do
     let(:next_command) do
-      Cuprum::Command.new { |attributes| attributes.merge('ok' => true) }
+      Cuprum::Command.new { |attributes:| attributes.merge('ok' => true) }
     end
 
     describe 'with attributes: an empty Hash' do
@@ -17,7 +17,7 @@ RSpec.describe Spec::Support::Middleware::Titleize do
       let(:expected_value) { { 'name' => '', 'ok' => true } }
 
       it 'should return a passing result' do
-        expect(middleware.call(next_command, attributes))
+        expect(middleware.call(next_command, attributes: attributes))
           .to be_a_passing_result
           .with_value(expected_value)
       end
@@ -28,7 +28,7 @@ RSpec.describe Spec::Support::Middleware::Titleize do
       let(:expected_value) { { 'name' => 'Pyra Mania', 'ok' => true } }
 
       it 'should return a passing result' do
-        expect(middleware.call(next_command, attributes))
+        expect(middleware.call(next_command, attributes: attributes))
           .to be_a_passing_result
           .with_value(expected_value)
       end

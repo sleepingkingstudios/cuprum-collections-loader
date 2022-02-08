@@ -7,7 +7,7 @@ RSpec.describe Spec::Support::Middleware::EncryptPassword do
 
   describe '#call' do
     let(:next_command) do
-      Cuprum::Command.new { |attributes| attributes.merge('ok' => true) }
+      Cuprum::Command.new { |attributes:| attributes.merge('ok' => true) }
     end
 
     describe 'with attributes: an empty Hash' do
@@ -15,7 +15,7 @@ RSpec.describe Spec::Support::Middleware::EncryptPassword do
       let(:expected_value) { { 'encrypted_password' => '', 'ok' => true } }
 
       it 'should return a passing result' do
-        expect(middleware.call(next_command, attributes))
+        expect(middleware.call(next_command, attributes: attributes))
           .to be_a_passing_result
           .with_value(expected_value)
       end
@@ -37,7 +37,7 @@ RSpec.describe Spec::Support::Middleware::EncryptPassword do
       end
 
       it 'should return a passing result' do
-        expect(middleware.call(next_command, attributes))
+        expect(middleware.call(next_command, attributes: attributes))
           .to be_a_passing_result
           .with_value(expected_value)
       end

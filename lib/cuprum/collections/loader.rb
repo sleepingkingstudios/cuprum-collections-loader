@@ -7,6 +7,7 @@ module Cuprum::Collections
   module Loader
     autoload :Errors,     'cuprum/collections/loader/errors'
     autoload :Formats,    'cuprum/collections/loader/formats'
+    autoload :Load,       'cuprum/collections/loader/load'
     autoload :Middleware, 'cuprum/collections/loader/middleware'
     autoload :Options,    'cuprum/collections/loader/options'
     autoload :Read,       'cuprum/collections/loader/read'

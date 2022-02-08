@@ -14,6 +14,7 @@ RSpec.describe Cuprum::Collections::Loader::Read do
       let(:expected_data) do
         [
           {
+            'id'     => 0,
             'title'  => 'How To Make Friends And Influence People:' \
                         ' Necromancy, Enchantment, and You',
             'author' => 'Abby Normal',
@@ -25,6 +26,7 @@ RSpec.describe Cuprum::Collections::Loader::Read do
             RAW
           },
           {
+            'id'     => 1,
             'title'  => 'the winter of our discontent',
             'author' => 'Pyra Mania',
             'review' => <<~RAW.strip
@@ -34,6 +36,7 @@ RSpec.describe Cuprum::Collections::Loader::Read do
             RAW
           },
           {
+            'id'     => 2,
             'title'  => 'BuRnInG lOvE',
             'author' => 'Pyra Mania',
             'review' => <<~RAW.strip
@@ -70,10 +73,12 @@ RSpec.describe Cuprum::Collections::Loader::Read do
       let(:expected_data) do
         [
           {
+            'id'       => 0,
             'name'     => 'Abby Normal',
             'password' => 'Frankenstein'
           },
           {
+            'id'       => 1,
             'name'     => 'Pyra Mania',
             'password' => 'Burn!!!'
           }
