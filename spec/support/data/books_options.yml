@@ -2,6 +2,8 @@
 find_by: title
 review:
   multiline: true
+require:
+  - support/middleware/titleize
 title:
   middleware:
     - Spec::Support::Middleware::Titleize

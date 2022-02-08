@@ -6,9 +6,6 @@ require 'stannum/constraints/anything'
 require 'cuprum/collections/loader/load'
 require 'cuprum/collections/loader/observer'
 
-require 'support/middleware/encrypt_password'
-require 'support/middleware/titleize'
-
 RSpec.describe Cuprum::Collections::Loader::Observer do
   subject(:observer) { described_class.new }
 

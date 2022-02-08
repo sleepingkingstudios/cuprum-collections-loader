@@ -49,6 +49,9 @@ RSpec.describe Cuprum::Collections::Loader::Read do
       let(:expected_options) do
         {
           'find_by' => 'title',
+          'require' => [
+            'support/middleware/titleize'
+          ],
           'review'  => {
             'multiline' => true
           },
@@ -88,6 +91,9 @@ RSpec.describe Cuprum::Collections::Loader::Read do
         {
           'middleware' => [
             'Spec::Support::Middleware::EncryptPassword'
+          ],
+          'require'    => [
+            'support/middleware/encrypt_password'
           ]
         }
       end

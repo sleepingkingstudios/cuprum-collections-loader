@@ -4,9 +4,6 @@ require 'yaml'
 
 require 'cuprum/collections/loader'
 
-require 'support/middleware/encrypt_password'
-require 'support/middleware/titleize'
-
 RSpec.describe Cuprum::Collections::Loader::Options::Parse do
   subject(:command) { described_class.new }
 

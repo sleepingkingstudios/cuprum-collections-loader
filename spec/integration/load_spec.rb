@@ -5,9 +5,6 @@ require 'stannum/constraints/anything'
 
 require 'cuprum/collections/loader/load'
 
-require 'support/middleware/encrypt_password'
-require 'support/middleware/titleize'
-
 RSpec.describe Cuprum::Collections::Loader::Load do
   subject(:command) { described_class.new(data_path: data_path) }
 
