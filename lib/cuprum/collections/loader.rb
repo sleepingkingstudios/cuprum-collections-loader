@@ -12,6 +12,7 @@ module Cuprum::Collections
     autoload :Observer,   'cuprum/collections/loader/observer'
     autoload :Options,    'cuprum/collections/loader/options'
     autoload :Read,       'cuprum/collections/loader/read'
+    autoload :Upsert,     'cuprum/collections/loader/upsert'
 
     # @return [String] The current version of the gem.
     def self.version

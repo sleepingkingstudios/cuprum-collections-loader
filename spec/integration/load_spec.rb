@@ -24,7 +24,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           default_contract: Stannum::Constraints::Anything.new
         )
       end
-      let(:expected_value) do
+      let(:loaded_entities) do
         [
           {
             'id'     => 0,
@@ -59,7 +59,10 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           }
         ]
       end
-      let(:expected_entities) { expected_value }
+      let(:expected_value) do
+        loaded_entities.map { |entity| ['create', entity] }
+      end
+      let(:expected_entities) { loaded_entities }
 
       it 'should return a passing result' do
         expect(command.call(collection: collection))
@@ -99,6 +102,11 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         let(:expected_entities) do
           [*super(), existing_entity]
         end
+        let(:expected_value) do
+          loaded_entities.map do |entity|
+            [entity['id'] == 0 ? 'create' : 'update', entity]
+          end
+        end
 
         before(:example) do
           collection.insert_one.call(entity: existing_entity)
@@ -133,7 +141,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           default_contract: Stannum::Constraints::Anything.new
         )
       end
-      let(:expected_value) do
+      let(:loaded_entities) do
         [
           {
             'id'                 => 0,
@@ -147,7 +155,10 @@ RSpec.describe Cuprum::Collections::Loader::Load do
           }
         ]
       end
-      let(:expected_entities) { expected_value }
+      let(:expected_value) do
+        loaded_entities.map { |entity| ['create', entity] }
+      end
+      let(:expected_entities) { loaded_entities }
 
       it 'should return a passing result' do
         expect(

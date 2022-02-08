@@ -2,11 +2,10 @@
 
 require 'observer'
 
-require 'cuprum/collections/commands/upsert'
-
 require 'cuprum/collections/loader'
 require 'cuprum/collections/loader/options/parse'
 require 'cuprum/collections/loader/read'
+require 'cuprum/collections/loader/upsert'
 
 module Cuprum::Collections::Loader
   # Reads data and options and creates data entities from configuration files.
@@ -26,7 +25,7 @@ module Cuprum::Collections::Loader
     private
 
     def apply_middleware(collection:, options:)
-      command    = Cuprum::Collections::Commands::Upsert.new(
+      command    = Cuprum::Collections::Loader::Upsert.new(
         attribute_names: options.fetch('find_by', 'id'),
         collection:      collection
       )

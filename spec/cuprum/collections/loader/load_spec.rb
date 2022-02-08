@@ -62,7 +62,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
     let(:parse_result)   { Cuprum::Result.new(value: parsed_options) }
     let(:upsert_results) do
       data.map do |attributes|
-        Cuprum::Result.new(value: [attributes, :created])
+        Cuprum::Result.new(value: [:create, attributes])
       end
     end
     let(:read_double) do
@@ -75,7 +75,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       )
     end
     let(:upsert_double) do
-      instance_double(Cuprum::Collections::Commands::Upsert, call: nil)
+      instance_double(Cuprum::Collections::Loader::Upsert, call: nil)
     end
     let(:expected_value) do
       upsert_results.map(&:value)
@@ -130,7 +130,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         .to receive(:new)
         .and_return(parse_double)
 
-      allow(Cuprum::Collections::Commands::Upsert)
+      allow(Cuprum::Collections::Loader::Upsert)
         .to receive(:new)
         .and_return(upsert_double)
 
@@ -175,7 +175,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
     it 'should upsert the entities', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
       command.call(collection: collection)
 
-      expect(Cuprum::Collections::Commands::Upsert)
+      expect(Cuprum::Collections::Loader::Upsert)
         .to have_received(:new)
         .with(attribute_names: 'id', collection: collection)
 
@@ -290,7 +290,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       it 'should upsert the entities', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
         command.call(collection: collection)
 
-        expect(Cuprum::Collections::Commands::Upsert)
+        expect(Cuprum::Collections::Loader::Upsert)
           .to have_received(:new)
           .with(attribute_names: 'slug', collection: collection)
 
@@ -365,7 +365,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       it 'should upsert the entities', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
         command.call(collection: collection)
 
-        expect(Cuprum::Collections::Commands::Upsert)
+        expect(Cuprum::Collections::Loader::Upsert)
           .to have_received(:new)
           .with(attribute_names: 'id', collection: collection)
 
