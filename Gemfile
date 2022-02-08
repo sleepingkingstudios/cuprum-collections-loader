@@ -14,6 +14,6 @@ gem 'cuprum',
 
 gem 'cuprum-collections',
   git:    'https://github.com/sleepingkingstudios/cuprum-collections',
-  branch: 'feature/commands'
+  branch: 'main'
 
 gem 'sleeping_king_studios-tasks', '~> 0.4', '>= 0.4.1'
