@@ -26,7 +26,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::Support::Middleware::Titleize).and(
               have_attributes(
                 attribute_name: 'title',
-                options:        {}
+                options:        { repository: nil }
               )
             )
           ],
@@ -50,7 +50,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         {
           'middleware' => [
             be_a(Spec::Support::Middleware::EncryptPassword).and(
-              have_attributes(options: {})
+              have_attributes(options: { repository: nil })
             )
           ]
         }

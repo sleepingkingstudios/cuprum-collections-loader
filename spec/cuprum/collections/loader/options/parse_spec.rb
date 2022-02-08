@@ -283,7 +283,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
-              .and(have_attributes(attribute_name: attribute_name, options: {}))
+              .and(
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: nil }
+                )
+              )
           ]
         end
 
@@ -303,7 +308,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           Array.new(3) do
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
-              .and(have_attributes(attribute_name: attribute_name, options: {}))
+              .and(
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: nil }
+                )
+              )
           end
         end
 
@@ -327,19 +337,28 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareOne).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 0 }
+                options:        {
+                  'index' => 0,
+                  repository: nil
+                }
               )
             ),
             be_a(Spec::MiddlewareTwo).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 1 }
+                options:        {
+                  'index' => 1,
+                  repository: nil
+                }
               )
             ),
             be_a(Spec::MiddlewareThree).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 2 }
+                options:        {
+                  'index' => 2,
+                  repository: nil
+                }
               )
             )
           ]
@@ -436,7 +455,9 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Cuprum::Collections::Loader::Middleware::EntityMiddleware).and(
-              have_attributes(options: {})
+              have_attributes(
+                options: { repository: nil }
+              )
             )
           ]
         end
@@ -457,7 +478,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           Array.new(3) do
             be_a(Cuprum::Collections::Loader::Middleware::EntityMiddleware).and(
-              have_attributes(options: {})
+              have_attributes(options: { repository: nil })
             )
           end
         end
@@ -480,13 +501,28 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Spec::MiddlewareOne).and(
-              have_attributes(options: { 'index' => 0 })
+              have_attributes(
+                options: {
+                  'index' => 0,
+                  repository: nil
+                }
+              )
             ),
             be_a(Spec::MiddlewareTwo).and(
-              have_attributes(options: { 'index' => 1 })
+              have_attributes(
+                options: {
+                  'index' => 1,
+                  repository: nil
+                }
+              )
             ),
             be_a(Spec::MiddlewareThree).and(
-              have_attributes(options: { 'index' => 2 })
+              have_attributes(
+                options: {
+                  'index' => 2,
+                  repository: nil
+                }
+              )
             )
           ]
         end
@@ -527,17 +563,35 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         {
           'middleware' => [
             be_a(Spec::MiddlewareOne).and(
-              have_attributes(options: { 'index' => 0 })
+              have_attributes(
+                options: {
+                  'index' => 0,
+                  repository: nil
+                }
+              )
             ),
             be_a(Spec::MiddlewareTwo).and(
-              have_attributes(options: { 'index' => 1 })
+              have_attributes(
+                options: {
+                  'index' => 1,
+                  repository: nil
+                }
+              )
             ),
             be_a(Spec::MiddlewareThree).and(
-              have_attributes(options: { 'index' => 2 })
+              have_attributes(
+                options: {
+                  'index' => 2,
+                  repository: nil
+                }
+              )
             ),
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
               .and(
-                have_attributes(attribute_name: attribute_name, options: {})
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: nil }
+                )
               )
           ],
           'name'       => { 'multiline' => true }
