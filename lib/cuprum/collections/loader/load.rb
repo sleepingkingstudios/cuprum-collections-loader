@@ -13,19 +13,26 @@ module Cuprum::Collections::Loader
     include Observable
 
     # @param data_path [String] The root url of the data files.
-    def initialize(data_path:)
+    # @param repository [Cuprum::Collections::Repository] The repository used to
+    #   query middleware data.
+    def initialize(data_path:, repository: nil)
       super(&nil)
 
-      @data_path = data_path
+      @data_path  = data_path
+      @repository = repository
     end
 
     # @return [String] the root url of the data files.
     attr_reader :data_path
 
+    # @return [Cuprum::Collections::Repository] the repository used to query
+    #   middleware data.
+    attr_reader :repository
+
     private
 
     def apply_middleware(collection:, options:)
-      command    = Cuprum::Collections::Loader::Upsert.new(
+      command = Cuprum::Collections::Loader::Upsert.new(
         attribute_names: options.fetch('find_by', 'id'),
         collection:      collection
       )
@@ -101,7 +108,9 @@ module Cuprum::Collections::Loader
     end
 
     def parse_options(options)
-      Cuprum::Collections::Loader::Options::Parse.new.call(options: options)
+      Cuprum::Collections::Loader::Options::Parse
+        .new(repository: repository)
+        .call(options: options)
     end
 
     def process(collection:, relative_path: nil) # rubocop:disable Metrics/MethodLength

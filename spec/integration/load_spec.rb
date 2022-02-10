@@ -1,21 +1,27 @@
 # frozen_string_literal: true
 
 require 'cuprum/collections/basic/collection'
+require 'cuprum/collections/basic/repository'
 require 'stannum/constraints/anything'
 
 require 'cuprum/collections/loader/load'
 
 RSpec.describe Cuprum::Collections::Loader::Load do
-  subject(:command) { described_class.new(data_path: data_path) }
+  subject(:command) do
+    described_class.new(data_path: data_path, repository: repository)
+  end
 
   let(:root_path) { __dir__.sub(%r{/spec/integration\z}, '') }
   let(:data_path) { File.join(root_path, 'spec/support/data') }
+  let(:repository) do
+    Cuprum::Collections::Basic::Repository.new
+  end
 
   describe '#call' do
     describe 'with books data' do
       let(:data) { [] }
       let(:collection) do
-        Cuprum::Collections::Basic::Collection.new(
+        repository.build(
           collection_name:  'books',
           data:             data,
           default_contract: Stannum::Constraints::Anything.new
@@ -132,7 +138,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       let(:relative_path) { '/authentication/users' }
       let(:data)          { [] }
       let(:collection) do
-        Cuprum::Collections::Basic::Collection.new(
+        repository.build(
           collection_name:  'users',
           data:             data,
           default_contract: Stannum::Constraints::Anything.new
