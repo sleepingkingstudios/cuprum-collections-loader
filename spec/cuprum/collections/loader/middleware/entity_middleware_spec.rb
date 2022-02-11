@@ -2,18 +2,24 @@
 
 require 'base64'
 
+require 'cuprum/collections/repository'
+
 require 'cuprum/collections/loader/middleware/entity_middleware'
 
 RSpec.describe Cuprum::Collections::Loader::Middleware::EntityMiddleware do
-  subject(:middleware) { described_class.new(**options) }
+  subject(:middleware) do
+    described_class.new(repository: repository, **options)
+  end
 
-  let(:options) { {} }
+  let(:repository) { nil }
+  let(:options)    { {} }
 
   describe '.new' do
     it 'should define the constructor' do
       expect(described_class)
         .to be_constructible
         .with(0).arguments
+        .and_keywords(:repository)
         .and_any_keywords
     end
   end
@@ -87,12 +93,32 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::EntityMiddleware do
   end
 
   describe '#options' do
-    include_examples 'should define reader', :options, -> { be == options }
+    let(:expected) { options.merge(repository: repository) }
+
+    include_examples 'should define reader', :options, -> { be == expected }
+
+    context 'when the middleware is initialized with a repository' do
+      let(:repository) { instance_double(Cuprum::Collections::Repository) }
+      let(:options)    { { repository: repository } }
+
+      it { expect(middleware.options).to be == expected }
+    end
 
     context 'when the middleware is initialized with options' do
       let(:options) { { key: 'value' } }
 
-      it { expect(middleware.options).to be == options }
+      it { expect(middleware.options).to be == expected }
+    end
+  end
+
+  describe '#repository' do
+    include_examples 'should define reader', :repository, nil
+
+    context 'when the middleware is initialized with a repository' do
+      let(:repository) { instance_double(Cuprum::Collections::Repository) }
+      let(:options)    { { repository: repository } }
+
+      it { expect(middleware.repository).to be repository }
     end
   end
 end

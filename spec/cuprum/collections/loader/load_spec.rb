@@ -16,7 +16,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       expect(described_class)
         .to be_constructible
         .with(0).arguments
-        .and_keywords(:data_path)
+        .and_keywords(:data_path, :repository)
     end
   end
 
@@ -88,6 +88,12 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       )
     end
     let(:relative_path) { collection.collection_name }
+    let(:repository) do
+      instance_double(Cuprum::Collections::Repository)
+    end
+    let(:constructor_options) do
+      super().merge(repository: repository)
+    end
     let(:expected_notifications) do
       [
         [
@@ -166,10 +172,16 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         .with(relative_path: collection.collection_name)
     end
 
-    it 'should parse the options' do
+    it 'should parse the options', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
       command.call(collection: collection)
 
-      expect(parse_double).to have_received(:call).with(options: options)
+      expect(Cuprum::Collections::Loader::Options::Parse)
+        .to have_received(:new)
+        .with(repository: repository)
+
+      expect(parse_double)
+        .to have_received(:call)
+        .with(options: options)
     end
 
     it 'should upsert the entities', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
@@ -187,6 +199,30 @@ RSpec.describe Cuprum::Collections::Loader::Load do
     end
 
     include_examples 'should notify the observers'
+
+    describe 'with collection: a collection with a qualified name' do
+      let(:collection) do
+        Cuprum::Collections::Basic::Collection.new(
+          collection_name:  'grimoires',
+          data:             [],
+          default_contract: Stannum::Constraints::Anything,
+          qualified_name:   'sources/grimoires'
+        )
+      end
+      let(:relative_path) { collection.qualified_name }
+
+      it 'should read the data', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
+        command.call(collection: collection)
+
+        expect(Cuprum::Collections::Loader::Read)
+          .to have_received(:new)
+          .with(data_path: data_path)
+
+        expect(read_double)
+          .to have_received(:call)
+          .with(relative_path: collection.qualified_name)
+      end
+    end
 
     describe 'with relative_path: value' do
       let(:relative_path) { 'metadata/publishers' }
@@ -383,5 +419,20 @@ RSpec.describe Cuprum::Collections::Loader::Load do
 
   describe '#data_path' do
     include_examples 'should define reader', :data_path, -> { data_path }
+  end
+
+  describe '#repository' do
+    include_examples 'should define reader', :repository, nil
+
+    context 'when initialized with repository: value' do
+      let(:repository) do
+        instance_double(Cuprum::Collections::Repository)
+      end
+      let(:constructor_options) do
+        super().merge(repository: repository)
+      end
+
+      it { expect(command.repository).to be repository }
+    end
   end
 end

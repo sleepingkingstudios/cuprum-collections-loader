@@ -6,7 +6,7 @@ module Cuprum::Collections::Loader::Errors
   # Error returned when parsing data returns an invalid value.
   class DataError < Cuprum::Error
     # Short string used to identify the type of error.
-    TYPE = 'librum/data/errors/data_error'
+    TYPE = 'cuprum/collections/loader/errors/data_error'
 
     # @param format [String] The expected format of the value.
     # @param parsed_value [Object] The parsed value.

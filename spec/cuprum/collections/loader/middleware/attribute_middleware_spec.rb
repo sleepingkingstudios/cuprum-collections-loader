@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
+require 'cuprum/collections/repository'
+
 require 'cuprum/collections/loader/middleware/attribute_middleware'
 
 RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
-  subject(:middleware) { described_class.new(attribute_name, **options) }
+  subject(:middleware) do
+    described_class.new(attribute_name, repository: repository, **options)
+  end
 
   let(:attribute_name) { 'name' }
+  let(:repository)     { nil }
   let(:options)        { {} }
 
   describe '.new' do
@@ -13,8 +18,45 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
       expect(described_class)
         .to be_constructible
         .with(1).argument
+        .and_keywords(:repository)
         .and_any_keywords
     end
+
+    describe 'with attribute_name: nil' do
+      let(:error_message) { 'invalid attribute name nil' }
+
+      it 'should raise an exception' do
+        expect { described_class.new(nil) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
+
+    describe 'with attribute_name: an Object' do
+      let(:object)        { Object.new.freeze }
+      let(:error_message) { "invalid attribute name #{object.inspect}" }
+
+      it 'should raise an exception' do
+        expect { described_class.new(object) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
+
+    describe 'with attribute_name: a Hash' do
+      let(:error_message) do
+        'wrong number of arguments (given 0, expected 1)'
+      end
+
+      it 'should raise an exception' do
+        expect { described_class.new(options) }
+          .to raise_error ArgumentError, error_message
+      end
+    end
+  end
+
+  describe '#attribute_name' do
+    include_examples 'should define reader',
+      :attribute_name,
+      -> { be == attribute_name }
   end
 
   describe '#call' do
@@ -81,19 +123,33 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
     end
   end
 
-  describe '#attribute_name' do
-    include_examples 'should define reader',
-      :attribute_name,
-      -> { be == attribute_name }
-  end
-
   describe '#options' do
-    include_examples 'should define reader', :options, -> { be == options }
+    let(:expected) { options.merge(repository: repository) }
+
+    include_examples 'should define reader', :options, -> { be == expected }
+
+    context 'when the middleware is initialized with a repository' do
+      let(:repository) { instance_double(Cuprum::Collections::Repository) }
+      let(:options)    { { repository: repository } }
+
+      it { expect(middleware.options).to be == expected }
+    end
 
     context 'when the middleware is initialized with options' do
       let(:options) { { key: 'value' } }
 
-      it { expect(middleware.options).to be == options }
+      it { expect(middleware.options).to be == expected }
+    end
+  end
+
+  describe '#repository' do
+    include_examples 'should define reader', :repository, nil
+
+    context 'when the middleware is initialized with a repository' do
+      let(:repository) { instance_double(Cuprum::Collections::Repository) }
+      let(:options)    { { repository: repository } }
+
+      it { expect(middleware.repository).to be repository }
     end
   end
 end

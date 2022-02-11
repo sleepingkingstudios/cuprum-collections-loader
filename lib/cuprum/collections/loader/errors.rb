@@ -5,6 +5,8 @@ require 'cuprum/collections/loader'
 module Cuprum::Collections::Loader
   # Namespace for error objects, which represent failure states.
   module Errors
+    autoload :CollectionError,
+      'cuprum/collections/loader/errors/collection_error'
     autoload :DataError,
       'cuprum/collections/loader/errors/data_error'
     autoload :LoadError,

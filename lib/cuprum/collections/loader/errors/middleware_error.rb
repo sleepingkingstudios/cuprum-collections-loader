@@ -6,7 +6,7 @@ module Cuprum::Collections::Loader::Errors
   # Error returned when unable to create the configured middleware.
   class MiddlewareError < Cuprum::Error
     # Short string used to identify the type of error.
-    TYPE = 'librum/data/errors/middleware_error'
+    TYPE = 'cuprum/collections/loader/errors/middleware_error'
 
     # @param attribute_name [String, Symbol] The name of the middleware
     #   attribute, if any.

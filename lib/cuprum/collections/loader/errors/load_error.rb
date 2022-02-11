@@ -6,7 +6,7 @@ module Cuprum::Collections::Loader::Errors
   # Error returned when unable to load a data file.
   class LoadError < Cuprum::Error
     # Short string used to identify the type of error.
-    TYPE = 'librum/data/errors/load_error'
+    TYPE = 'cuprum/collections/loader/errors/load_error'
 
     # @param file_path [String] The path to the expected file.
     # @param message [String] The error message to display.

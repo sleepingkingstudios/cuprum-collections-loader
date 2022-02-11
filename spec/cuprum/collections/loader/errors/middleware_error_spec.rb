@@ -13,7 +13,7 @@ RSpec.describe Cuprum::Collections::Loader::Errors::MiddlewareError do
   describe '::TYPE' do
     include_examples 'should define constant',
       :TYPE,
-      'librum/data/errors/middleware_error'
+      'cuprum/collections/loader/errors/middleware_error'
   end
 
   describe '.new' do

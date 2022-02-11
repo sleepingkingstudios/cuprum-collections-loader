@@ -1,21 +1,27 @@
 # frozen_string_literal: true
 
 require 'cuprum/collections/basic/collection'
+require 'cuprum/collections/basic/repository'
 require 'stannum/constraints/anything'
 
 require 'cuprum/collections/loader/load'
 
 RSpec.describe Cuprum::Collections::Loader::Load do
-  subject(:command) { described_class.new(data_path: data_path) }
+  subject(:command) do
+    described_class.new(data_path: data_path, repository: repository)
+  end
 
   let(:root_path) { __dir__.sub(%r{/spec/integration\z}, '') }
   let(:data_path) { File.join(root_path, 'spec/support/data') }
+  let(:repository) do
+    Cuprum::Collections::Basic::Repository.new
+  end
 
   describe '#call' do
     describe 'with books data' do
       let(:data) { [] }
       let(:collection) do
-        Cuprum::Collections::Basic::Collection.new(
+        repository.build(
           collection_name:  'books',
           data:             data,
           default_contract: Stannum::Constraints::Anything.new
@@ -132,7 +138,7 @@ RSpec.describe Cuprum::Collections::Loader::Load do
       let(:relative_path) { '/authentication/users' }
       let(:data)          { [] }
       let(:collection) do
-        Cuprum::Collections::Basic::Collection.new(
+        repository.build(
           collection_name:  'users',
           data:             data,
           default_contract: Stannum::Constraints::Anything.new
@@ -170,6 +176,62 @@ RSpec.describe Cuprum::Collections::Loader::Load do
 
         expect(collection.find_matching.call.value.to_a)
           .to be == expected_entities
+      end
+
+      describe 'with credentials data' do
+        let(:credentials_collection) do
+          repository.build(
+            collection_name:  'credentials',
+            data:             [],
+            default_contract: Stannum::Constraints::Anything.new,
+            qualified_name:   'authentication/credentials'
+          )
+        end
+        let(:loaded_entities) do
+          [
+            {
+              'id'      => 0,
+              'api_key' => '12345',
+              'user'    => {
+                'id'                 => 0,
+                'name'               => 'Abby Normal',
+                'encrypted_password' => 'kwfspjsxyjns'
+              }
+            },
+            {
+              'id'      => 1,
+              'api_key' => '67890',
+              'user'    => {
+                'id'                 => 1,
+                'name'               => 'Pyra Mania',
+                'encrypted_password' => 'gzws'
+              }
+            }
+          ]
+        end
+        let(:expected_value) do
+          loaded_entities.map { |entity| ['create', entity] }
+        end
+        let(:expected_entities) { loaded_entities }
+
+        before(:example) do
+          command.call(collection: collection, relative_path: relative_path)
+        end
+
+        it 'should return a passing result' do
+          expect(command.call(collection: credentials_collection))
+            .to be_a_passing_result
+            .with_value(expected_value)
+        end
+
+        it 'should update the collection' do
+          command.call(collection: credentials_collection)
+
+          expect(
+            credentials_collection.find_matching.call(order: 'id').value.to_a
+          )
+            .to be == expected_entities
+        end
       end
     end
   end

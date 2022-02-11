@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'cuprum/collections/repository'
+
 require 'cuprum/collections/loader/options/parse'
 
 RSpec.describe Cuprum::Collections::Loader::Options::Parse do
@@ -8,7 +10,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
   let(:constructor_options) { {} }
 
   describe '.new' do
-    it { expect(described_class).to be_constructible.with(0).arguments }
+    it 'should define the constructor' do
+      expect(described_class)
+        .to be_constructible
+        .with(0).arguments
+        .and_keywords(:repository)
+    end
   end
 
   describe '#call' do
@@ -19,7 +26,9 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
           )
         end
 
@@ -36,19 +45,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           # :nocov:
           if RUBY_VERSION < '3.1.0'
             'wrong constant name invalid string'
-          elsif middleware_options.empty?
-            <<~MESSAGE.strip
-              wrong constant name invalid string
-
-                      Object.const_get(class_name).new(*args)
-                            ^^^^^^^^^^
-            MESSAGE
           else
             <<~MESSAGE.strip
               wrong constant name invalid string
 
-                      Object.const_get(class_name).new(*args, **options)
-                            ^^^^^^^^^^
+                    Object.const_get(class_name).new(*args, **options)
+                          ^^^^^^^^^^
             MESSAGE
           end
           # :nocov:
@@ -57,7 +59,10 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options,
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
+                            .merge(repository: repository),
             message:        expected_message
           )
         end
@@ -75,19 +80,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           # :nocov:
           if RUBY_VERSION < '3.1.0'
             'uninitialized constant InvalidString'
-          elsif middleware_options.empty?
-            <<~MESSAGE.strip
-              uninitialized constant InvalidString
-
-                      Object.const_get(class_name).new(*args)
-                            ^^^^^^^^^^
-            MESSAGE
           else
             <<~MESSAGE.strip
               uninitialized constant InvalidString
 
-                      Object.const_get(class_name).new(*args, **options)
-                            ^^^^^^^^^^
+                    Object.const_get(class_name).new(*args, **options)
+                          ^^^^^^^^^^
             MESSAGE
           end
           # :nocov:
@@ -96,7 +94,10 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options,
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
+                            .merge(repository: repository),
             message:        expected_message
           )
         end
@@ -153,11 +154,16 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
       end
     end
 
+    let(:repository) { instance_double(Cuprum::Collections::Repository) }
     let(:require_proxy) do
       class_double(Kernel, require: nil)
     end
     let(:constructor_options) do
-      super().merge(require_proxy: require_proxy)
+      super().merge(require_proxy: require_proxy, repository: repository)
+    end
+
+    def tools
+      SleepingKingStudios::Tools::Toolbelt.instance
     end
 
     it 'should define the method' do
@@ -264,7 +270,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware,
-            options:        {},
+            options:        { repository: repository },
             message:        'wrong number of arguments (given 1, expected 0)'
           )
         end
@@ -283,7 +289,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
-              .and(have_attributes(attribute_name: attribute_name, options: {}))
+              .and(
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: repository }
+                )
+              )
           ]
         end
 
@@ -303,7 +314,12 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           Array.new(3) do
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
-              .and(have_attributes(attribute_name: attribute_name, options: {}))
+              .and(
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: repository }
+                )
+              )
           end
         end
 
@@ -327,19 +343,28 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareOne).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 0 }
+                options:        {
+                  index:      0,
+                  repository: repository
+                }
               )
             ),
             be_a(Spec::MiddlewareTwo).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 1 }
+                options:        {
+                  index:      1,
+                  repository: repository
+                }
               )
             ),
             be_a(Spec::MiddlewareThree).and(
               have_attributes(
                 attribute_name: attribute_name,
-                options:        { 'index' => 2 }
+                options:        {
+                  index:      2,
+                  repository: repository
+                }
               )
             )
           ]
@@ -417,7 +442,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware,
-            options:        {},
+            options:        { repository: repository },
             message:        'wrong number of arguments (given 0, expected 1)'
           )
         end
@@ -436,7 +461,9 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Cuprum::Collections::Loader::Middleware::EntityMiddleware).and(
-              have_attributes(options: {})
+              have_attributes(
+                options: { repository: repository }
+              )
             )
           ]
         end
@@ -457,7 +484,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           Array.new(3) do
             be_a(Cuprum::Collections::Loader::Middleware::EntityMiddleware).and(
-              have_attributes(options: {})
+              have_attributes(options: { repository: repository })
             )
           end
         end
@@ -480,13 +507,28 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         let(:expected_middleware) do
           [
             be_a(Spec::MiddlewareOne).and(
-              have_attributes(options: { 'index' => 0 })
+              have_attributes(
+                options: {
+                  index:      0,
+                  repository: repository
+                }
+              )
             ),
             be_a(Spec::MiddlewareTwo).and(
-              have_attributes(options: { 'index' => 1 })
+              have_attributes(
+                options: {
+                  index:      1,
+                  repository: repository
+                }
+              )
             ),
             be_a(Spec::MiddlewareThree).and(
-              have_attributes(options: { 'index' => 2 })
+              have_attributes(
+                options: {
+                  index:      2,
+                  repository: repository
+                }
+              )
             )
           ]
         end
@@ -527,17 +569,35 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
         {
           'middleware' => [
             be_a(Spec::MiddlewareOne).and(
-              have_attributes(options: { 'index' => 0 })
+              have_attributes(
+                options: {
+                  index:      0,
+                  repository: repository
+                }
+              )
             ),
             be_a(Spec::MiddlewareTwo).and(
-              have_attributes(options: { 'index' => 1 })
+              have_attributes(
+                options: {
+                  index:      1,
+                  repository: repository
+                }
+              )
             ),
             be_a(Spec::MiddlewareThree).and(
-              have_attributes(options: { 'index' => 2 })
+              have_attributes(
+                options: {
+                  index:      2,
+                  repository: repository
+                }
+              )
             ),
             be_a(Cuprum::Collections::Loader::Middleware::AttributeMiddleware)
               .and(
-                have_attributes(attribute_name: attribute_name, options: {})
+                have_attributes(
+                  attribute_name: attribute_name,
+                  options:        { repository: repository }
+                )
               )
           ],
           'name'       => { 'multiline' => true }
@@ -603,6 +663,19 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             .with(require_path)
         end
       end
+    end
+  end
+
+  describe '#repository' do
+    include_examples 'should define reader', :repository, nil
+
+    context 'when initialized with repository: value' do
+      let(:repository) { instance_double(Cuprum::Collections::Repository) }
+      let(:constructor_options) do
+        super().merge(repository: repository)
+      end
+
+      it { expect(command.repository).to be repository }
     end
   end
 
