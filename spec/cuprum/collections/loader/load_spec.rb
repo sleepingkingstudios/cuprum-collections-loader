@@ -200,6 +200,30 @@ RSpec.describe Cuprum::Collections::Loader::Load do
 
     include_examples 'should notify the observers'
 
+    describe 'with collection: a collection with a qualified name' do
+      let(:collection) do
+        Cuprum::Collections::Basic::Collection.new(
+          collection_name:  'grimoires',
+          data:             [],
+          default_contract: Stannum::Constraints::Anything,
+          qualified_name:   'sources/grimoires'
+        )
+      end
+      let(:relative_path) { collection.qualified_name }
+
+      it 'should read the data', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
+        command.call(collection: collection)
+
+        expect(Cuprum::Collections::Loader::Read)
+          .to have_received(:new)
+          .with(data_path: data_path)
+
+        expect(read_double)
+          .to have_received(:call)
+          .with(relative_path: collection.qualified_name)
+      end
+    end
+
     describe 'with relative_path: value' do
       let(:relative_path) { 'metadata/publishers' }
 

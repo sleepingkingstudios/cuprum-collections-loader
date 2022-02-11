@@ -114,7 +114,7 @@ module Cuprum::Collections::Loader
     end
 
     def process(collection:, relative_path: nil) # rubocop:disable Metrics/MethodLength
-      relative_path ||= collection.collection_name
+      relative_path ||= collection.qualified_name
       data, options, parsed_options = nil
 
       notify_read(collection: collection, relative_path: relative_path) do

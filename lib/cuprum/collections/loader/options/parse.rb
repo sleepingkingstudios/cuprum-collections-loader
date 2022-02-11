@@ -26,10 +26,12 @@ module Cuprum::Collections::Loader::Options
     attr_reader :require_proxy
 
     def create_middleware(class_name, attribute_name = nil, **options) # rubocop:disable Metrics/MethodLength
+      args    = attribute_name ? [attribute_name] : []
+      options = tools.hash_tools.convert_keys_to_symbols(options)
+
       step { validate_class_name(class_name, attribute_name, **options) }
 
-      args    = attribute_name ? [attribute_name] : []
-      options = options.merge(repository: repository)
+      options.update(repository: repository)
 
       Object.const_get(class_name).new(*args, **options)
     rescue ArgumentError, NameError => exception
@@ -123,6 +125,10 @@ module Cuprum::Collections::Loader::Options
           [attribute_name, parsed_option]
         end
         .merge('middleware' => middleware)
+    end
+
+    def tools
+      SleepingKingStudios::Tools::Toolbelt.instance
     end
 
     def validate_class_name(class_name, attribute_name, **options)

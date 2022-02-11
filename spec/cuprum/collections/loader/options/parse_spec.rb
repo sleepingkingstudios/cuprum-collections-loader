@@ -26,7 +26,9 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
           )
         end
 
@@ -57,7 +59,10 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options.merge(repository: repository),
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
+                            .merge(repository: repository),
             message:        expected_message
           )
         end
@@ -89,7 +94,10 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
           Cuprum::Collections::Loader::Errors::MiddlewareError.new(
             attribute_name: attribute_name,
             middleware:     middleware_value,
-            options:        middleware_options.merge(repository: repository),
+            options:        tools
+                            .hash_tools
+                            .convert_keys_to_symbols(middleware_options)
+                            .merge(repository: repository),
             message:        expected_message
           )
         end
@@ -152,6 +160,10 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
     end
     let(:constructor_options) do
       super().merge(require_proxy: require_proxy, repository: repository)
+    end
+
+    def tools
+      SleepingKingStudios::Tools::Toolbelt.instance
     end
 
     it 'should define the method' do
@@ -332,7 +344,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
               have_attributes(
                 attribute_name: attribute_name,
                 options:        {
-                  'index' => 0,
+                  index:      0,
                   repository: repository
                 }
               )
@@ -341,7 +353,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
               have_attributes(
                 attribute_name: attribute_name,
                 options:        {
-                  'index' => 1,
+                  index:      1,
                   repository: repository
                 }
               )
@@ -350,7 +362,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
               have_attributes(
                 attribute_name: attribute_name,
                 options:        {
-                  'index' => 2,
+                  index:      2,
                   repository: repository
                 }
               )
@@ -497,7 +509,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareOne).and(
               have_attributes(
                 options: {
-                  'index' => 0,
+                  index:      0,
                   repository: repository
                 }
               )
@@ -505,7 +517,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareTwo).and(
               have_attributes(
                 options: {
-                  'index' => 1,
+                  index:      1,
                   repository: repository
                 }
               )
@@ -513,7 +525,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareThree).and(
               have_attributes(
                 options: {
-                  'index' => 2,
+                  index:      2,
                   repository: repository
                 }
               )
@@ -559,7 +571,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareOne).and(
               have_attributes(
                 options: {
-                  'index' => 0,
+                  index:      0,
                   repository: repository
                 }
               )
@@ -567,7 +579,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareTwo).and(
               have_attributes(
                 options: {
-                  'index' => 1,
+                  index:      1,
                   repository: repository
                 }
               )
@@ -575,7 +587,7 @@ RSpec.describe Cuprum::Collections::Loader::Options::Parse do
             be_a(Spec::MiddlewareThree).and(
               have_attributes(
                 options: {
-                  'index' => 2,
+                  index:      2,
                   repository: repository
                 }
               )

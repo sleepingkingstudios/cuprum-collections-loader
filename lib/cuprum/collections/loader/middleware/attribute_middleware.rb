@@ -8,8 +8,10 @@ module Cuprum::Collections::Loader::Middleware
         Cuprum::Collections::Loader::Middleware::EntityMiddleware
     # @param attribute_name [String, Symbol] The name of the attribute.
     # @param options [Hash<Symbol, Object>] Options for the middleware.
-    def initialize(attribute_name, **options)
-      super(**options)
+    # @param repository [Cuprum::Collections::Repository] The repository used
+    #   to query data.
+    def initialize(attribute_name, repository: nil, **options)
+      super(repository: repository, **options)
 
       validate_attribute_name!(attribute_name)
 

@@ -53,6 +53,12 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
     end
   end
 
+  describe '#attribute_name' do
+    include_examples 'should define reader',
+      :attribute_name,
+      -> { be == attribute_name }
+  end
+
   describe '#call' do
     let(:attributes) { { 'name' => 'Alan Bradley' } }
     let(:next_command) do
@@ -115,12 +121,6 @@ RSpec.describe Cuprum::Collections::Loader::Middleware::AttributeMiddleware do
           .with_value(expected_value)
       end
     end
-  end
-
-  describe '#attribute_name' do
-    include_examples 'should define reader',
-      :attribute_name,
-      -> { be == attribute_name }
   end
 
   describe '#options' do

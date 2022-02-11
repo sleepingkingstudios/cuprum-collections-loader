@@ -177,6 +177,62 @@ RSpec.describe Cuprum::Collections::Loader::Load do
         expect(collection.find_matching.call.value.to_a)
           .to be == expected_entities
       end
+
+      describe 'with credentials data' do
+        let(:credentials_collection) do
+          repository.build(
+            collection_name:  'credentials',
+            data:             [],
+            default_contract: Stannum::Constraints::Anything.new,
+            qualified_name:   'authentication/credentials'
+          )
+        end
+        let(:loaded_entities) do
+          [
+            {
+              'id'      => 0,
+              'api_key' => '12345',
+              'user'    => {
+                'id'                 => 0,
+                'name'               => 'Abby Normal',
+                'encrypted_password' => 'kwfspjsxyjns'
+              }
+            },
+            {
+              'id'      => 1,
+              'api_key' => '67890',
+              'user'    => {
+                'id'                 => 1,
+                'name'               => 'Pyra Mania',
+                'encrypted_password' => 'gzws'
+              }
+            }
+          ]
+        end
+        let(:expected_value) do
+          loaded_entities.map { |entity| ['create', entity] }
+        end
+        let(:expected_entities) { loaded_entities }
+
+        before(:example) do
+          command.call(collection: collection, relative_path: relative_path)
+        end
+
+        it 'should return a passing result' do
+          expect(command.call(collection: credentials_collection))
+            .to be_a_passing_result
+            .with_value(expected_value)
+        end
+
+        it 'should update the collection' do
+          command.call(collection: credentials_collection)
+
+          expect(
+            credentials_collection.find_matching.call(order: 'id').value.to_a
+          )
+            .to be == expected_entities
+        end
+      end
     end
   end
 end
