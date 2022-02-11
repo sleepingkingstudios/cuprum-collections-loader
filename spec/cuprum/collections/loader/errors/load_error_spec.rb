@@ -13,7 +13,7 @@ RSpec.describe Cuprum::Collections::Loader::Errors::LoadError do
   describe '::TYPE' do
     include_examples 'should define constant',
       :TYPE,
-      'librum/data/errors/load_error'
+      'cuprum/collections/loader/errors/load_error'
   end
 
   describe '.new' do

@@ -6,7 +6,7 @@ module Cuprum::Collections::Loader::Errors
   # Error returned when attempting to parse an invalid value.
   class ParseError < Cuprum::Error
     # Short string used to identify the type of error.
-    TYPE = 'librum/data/errors/parse_error'
+    TYPE = 'cuprum/collections/loader/errors/parse_error'
 
     # @param format [String] The expected format of the value.
     # @param raw_value [Object] The raw value prior to parsing.

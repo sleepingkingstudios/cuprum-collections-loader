@@ -17,7 +17,7 @@ RSpec.describe Cuprum::Collections::Loader::Errors::ParseError do
   describe '::TYPE' do
     include_examples 'should define constant',
       :TYPE,
-      'librum/data/errors/parse_error'
+      'cuprum/collections/loader/errors/parse_error'
   end
 
   describe '.new' do
