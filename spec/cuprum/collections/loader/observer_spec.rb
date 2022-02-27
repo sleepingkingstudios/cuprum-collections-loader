@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'cuprum/collections/errors/failed_validation'
+
 require 'cuprum/collections/loader/observer'
 
 RSpec.describe Cuprum::Collections::Loader::Observer do
@@ -131,6 +133,56 @@ RSpec.describe Cuprum::Collections::Loader::Observer do
           '- Unable to calculate book with id 0, title "Gideon the Ninth":' \
             " #{error.message}\n"
         end
+
+        it 'should write to STDOUT' do
+          expect { observer.update(:failure, details) }
+            .to output(expected_output)
+            .to_stdout
+        end
+      end
+
+      describe 'with a result without an action' do
+        let(:result) { Cuprum::Result.new(error: error) }
+        let(:expected_output) do
+          "- Unable to process book with id 0: #{error.message}\n"
+        end
+
+        it 'should write to STDOUT' do
+          expect { observer.update(:failure, details) }
+            .to output(expected_output)
+            .to_stdout
+        end
+      end
+
+      describe 'with a result with a FailedValidation error' do # rubocop:disable RSpec/MultipleMemoizedHelpers
+        let(:collection_name) { 'rockets' }
+        let(:errors) do
+          Stannum::Errors.new.tap do |err|
+            err.add('spec.error', message: 'is invalid')
+            err[:launch_clamps].add('spec.error', message: 'are engaged')
+            err[:fuel_tanks][:oxidizer].add('spec.error', message: 'is empty')
+          end
+        end
+        let(:error) do
+          Cuprum::Collections::Errors::FailedValidation.new(
+            entity_class: Spec::Rocket,
+            errors:       errors
+          )
+        end
+        let(:result) do
+          Cuprum::Result.new(
+            status: :failure,
+            error:  error,
+            value:  ['launch', nil]
+          )
+        end
+        let(:expected_output) do
+          "- Unable to launch rocket with id 0: #{error.message}" \
+            ' (is invalid, launch_clamps are engaged,' \
+            " fuel_tanks.oxidizer is empty)\n"
+        end
+
+        example_class 'Spec::Rocket'
 
         it 'should write to STDOUT' do
           expect { observer.update(:failure, details) }
