@@ -35,9 +35,10 @@ module Cuprum::Collections::Loader
       puts "#{message}: #{error.message}"
     end
 
-    def failure(attributes:, collection_name:, options:, result:)
+    def failure(attributes:, collection_name:, options:, result:) # rubocop:disable Metrics/MethodLength
       collection_name = tools.string_tools.singularize(collection_name)
-      action          = result.value.first
+      action          =
+        result.value.is_a?(Array) ? result.value.first : 'process'
       message         = "Unable to #{action} #{collection_name}"
       with_message    =
         attributes_message(

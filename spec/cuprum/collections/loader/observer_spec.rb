@@ -138,6 +138,19 @@ RSpec.describe Cuprum::Collections::Loader::Observer do
             .to_stdout
         end
       end
+
+      describe 'with a result without an action' do
+        let(:result) { Cuprum::Result.new(error: error) }
+        let(:expected_output) do
+          "- Unable to process book with id 0: #{error.message}\n"
+        end
+
+        it 'should write to STDOUT' do
+          expect { observer.update(:failure, details) }
+            .to output(expected_output)
+            .to_stdout
+        end
+      end
     end
 
     describe 'with :start' do
