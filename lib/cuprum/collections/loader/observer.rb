@@ -35,6 +35,25 @@ module Cuprum::Collections::Loader
       puts "#{message}: #{error.message}"
     end
 
+    def error_message(result) # rubocop:disable Metrics/MethodLength
+      message = result.error.message
+
+      unless result.error.is_a?(Cuprum::Collections::Errors::FailedValidation)
+        return message
+      end
+
+      return message if result.error.errors.empty?
+
+      error_messages =
+        result
+        .error
+        .errors
+        .map { |error| format_error_message(error) }
+        .join(', ')
+
+      "#{message} (#{error_messages})"
+    end
+
     def failure(attributes:, collection_name:, options:, result:) # rubocop:disable Metrics/MethodLength
       collection_name = tools.string_tools.singularize(collection_name)
       action          =
@@ -47,10 +66,16 @@ module Cuprum::Collections::Loader
           result:     result
         )
 
-      puts "- #{message} #{with_message}: #{result.error.message}"
+      puts "- #{message} #{with_message}: #{error_message(result)}"
     end
 
     def finish(**_); end
+
+    def format_error_message(error)
+      return error[:message] if error[:path].empty?
+
+      "#{error[:path].join('.')} #{error[:message]}"
+    end
 
     def start(collection_name:, data:, data_path:, relative_path:, **_)
       if data.count == 1
